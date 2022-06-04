@@ -1,0 +1,16 @@
+{
+  "name": "mlp2xlsx",
+  "version": "1.0.0",
+  "description": "Converts mAirlist playlist files to an Excel",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": ["mAirlist"],
+  "author": "frankmathy@gmail.com",
+  "license": "ISC",
+  "dependencies": {
+    "excel4node": "^1.7.2",
+    "xml2js": "^0.4.23"
+  }
+}
