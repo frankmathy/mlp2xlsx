@@ -17,6 +17,9 @@ var wb = new xl.Workbook();
 var ws = wb.addWorksheet("Playlist");
 ws.cell(1, 1).string("Playlist: ");
 let row = 3;
+ws.cell(row, 1).string("Artist");
+ws.cell(row, 2).string("Title");
+ws.cell(row++, 3).string("Artist - Title");
 
 mlpFiles.forEach((fileName) => {
   var songCount = 0;
