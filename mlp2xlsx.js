@@ -33,14 +33,16 @@ mlpFiles.forEach((fileName) => {
       throw err;
     }
     data.Playlist.PlaylistItem.forEach((item) => {
-      const [itemType] = item.Type;
-      if (itemType === "Music") {
-        const [artist] = item.Artist;
-        const [title] = item.Title;
-        ws.cell(row, 1).string(artist);
-        ws.cell(row, 2).string(title);
-        ws.cell(row++, 3).string(artist + " - " + title);
-        songCount++;
+      if(item.Type !== undefined) {
+        const [itemType] = item.Type;
+        if (itemType === "Music") {
+          const [artist] = item.Artist;
+          const [title] = item.Title;
+          ws.cell(row, 1).string(artist);
+          ws.cell(row, 2).string(title);
+          ws.cell(row++, 3).string(artist + " - " + title);
+          songCount++;
+        }
       }
     });
   });
