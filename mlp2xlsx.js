@@ -5,9 +5,7 @@ const fs = require("fs");
 var xl = require("excel4node");
 
 if (process.argv.length < 4) {
-  console.log(
-    `Usage: ${process.argv[0]} ${process.argv[1]} <ExcelFileName.xlsx> <Input1.mlp,Input2.mlp,...>`
-  );
+  console.log(`Usage: ${process.argv[0]} ${process.argv[1]} <ExcelFileName.xlsx> <Input1.mlp,Input2.mlp,...>`);
   process.exit();
 }
 const excelFileName = process.argv[2];
@@ -33,7 +31,7 @@ mlpFiles.forEach((fileName) => {
       throw err;
     }
     data.Playlist.PlaylistItem.forEach((item) => {
-      if(item.Type !== undefined) {
+      if (item.Type !== undefined) {
         const [itemType] = item.Type;
         if (itemType === "Music") {
           const [artist] = item.Artist;
