@@ -7,19 +7,12 @@ const path = require("path");
 const moment = require("moment");
 var xl = require("excel4node");
 
-const isValidTrackEntry = (entryString) => {
-  return (
-    entryString !== undefined &&
-    entryString !== "" &&
-    !entryString.startsWith("Playlist") &&
-    !entryString.startsWith("Künstler") &&
-    !entryString.startsWith("Artist")
-  );
-};
+const isValidString = (value) => typeof value === "string";
 
 const getDateFromFileName = (fileName) => {
   if (fileName !== undefined && fileName.length > 0) {
-    const dirName = fileName.split("/")[0];
+    const pathNameParts = fileName.split("/");
+    const dirName = pathNameParts[pathNameParts.length - 2];
     try {
       const fileDate = moment(dirName, "YYYY-MM-DD");
       return fileDate.isValid() ? fileDate.toDate() : dirName;
@@ -38,7 +31,7 @@ if (process.argv.length < 4) {
 const directoryName = process.argv[2];
 const excelFileName = process.argv[3];
 
-var allSongs = [["Artist", "Title", "Date"]];
+var allSongs = [["Artist", "Title", "Date", "File Name"]];
 
 const files = fs.readdirSync(directoryName, {
   recursive: true,
@@ -51,16 +44,24 @@ xlsxFiles.forEach((xlsFileName) => {
     const sheets = file.SheetNames;
     if (sheets.length > 0) {
       const trackData = xlsx.utils.sheet_to_json(file.Sheets[file.SheetNames[0]], { header: 1 });
-      const filteredTrackData = trackData
-        .filter((line) => isValidTrackEntry(line[0]))
-        .map((filteredLine) => [
-          filteredLine[0].trim(),
-          filteredLine[1].trim(),
-          getDateFromFileName(xlsFileName),
-          xlsPathName,
-        ]);
-      console.log(`${xlsPathName} => ${filteredTrackData.length} songs`);
-      allSongs = allSongs.concat(filteredTrackData);
+      trackData.forEach((line, lineIndex) => {
+        const artistColumn = line.findIndex((element) => element === "Artist" || element === "Künstler");
+        const titleColumn = line.findIndex((element) => element === "Titel" || element === "Title");
+        if (artistColumn >= 0 && titleColumn >= 0) {
+          const filteredTrackData = trackData.slice(lineIndex + 1);
+          outputTrackData = filteredTrackData
+            .filter((line) => isValidString(line[artistColumn]) && isValidString(line[titleColumn]))
+            .map((filteredLine) => [
+              filteredLine[artistColumn].trim(),
+              filteredLine[titleColumn].trim(),
+              getDateFromFileName(xlsFileName),
+              xlsPathName,
+            ]);
+          console.log(`${xlsPathName} => ${filteredTrackData.length} songs`);
+          allSongs = allSongs.concat(outputTrackData);
+          return false;
+        }
+      });
     }
   }
 });
