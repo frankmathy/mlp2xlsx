@@ -4,6 +4,7 @@ const xlsx = require("xlsx");
 const nodeXlsx = require("node-xlsx");
 const fs = require("fs");
 const path = require("path");
+const moment = require("moment");
 var xl = require("excel4node");
 
 const isValidTrackEntry = (entryString) => {
@@ -19,8 +20,12 @@ const isValidTrackEntry = (entryString) => {
 const getDateFromFileName = (fileName) => {
   if (fileName !== undefined && fileName.length > 0) {
     const dirName = fileName.split("/")[0];
-    const dates = dirName.split("-");
-    return dates.length === 3 ? `${dates[2]}.${dates[1]}.${dates[0]}` : dirName;
+    try {
+      const fileDate = moment(dirName, "YYYY-MM-DD");
+      return fileDate.isValid() ? fileDate.toDate() : dirName;
+    } catch (error) {
+      return dirname;
+    }
   } else {
     return undefined;
   }
@@ -48,7 +53,12 @@ xlsxFiles.forEach((xlsFileName) => {
       const trackData = xlsx.utils.sheet_to_json(file.Sheets[file.SheetNames[0]], { header: 1 });
       const filteredTrackData = trackData
         .filter((line) => isValidTrackEntry(line[0]))
-        .map((filteredLine) => [filteredLine[0], filteredLine[1], getDateFromFileName(xlsFileName)]);
+        .map((filteredLine) => [
+          filteredLine[0].trim(),
+          filteredLine[1].trim(),
+          getDateFromFileName(xlsFileName),
+          xlsPathName,
+        ]);
       console.log(`${xlsPathName} => ${filteredTrackData.length} songs`);
       allSongs = allSongs.concat(filteredTrackData);
     }
